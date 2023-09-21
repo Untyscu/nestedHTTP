@@ -1,6 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-from modules import request_handler
+from modules import zipper
+# from modules import executor
 RECEIVER = ''
 
 if __name__ == '__main__':
@@ -10,13 +11,15 @@ if __name__ == '__main__':
         def do_GET(self):
             headers = self.headers
             url_parts = urlparse(self.path)
-            query_parameters = parse_qs(url_parts.query)
-            print(headers['Host']+'n\****\n')
-            print(query_parameters)
-        
+            # query_parameters = parse_qs(url_parts.query)
+            query = headers['Host']+'?'+url_parts.query
+            bquery = bytes(query,'utf-8')
+            zipped_query = zipper.zipper(bquery, 'zip')
+            unzipped_query = zipper.zipper(zipped_query, 'unzip')
+
             self.send_response(200)
             self.end_headers()
-            self.wfile.write(bytes('GET запит оброблено успішно.','utf-8'))
+            self.wfile.write(unzipped_query)
 
         def do_POST(self):
             print()
